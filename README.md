@@ -30,6 +30,7 @@ strumenti/
   prepara.js    capitoli in Markdown + audio + sottotitoli → dati del libro
   crea-sito.js  copia il lettore nel sito e lo personalizza con catalogo.json o libro.json
   server.js     server locale per provare il sito
+  leggio.js     un comando solo per i tre strumenti: leggio prepara | sito | prova
   icone.py      icone PNG (iPhone, Android) da icona.svg
 ```
 
@@ -67,7 +68,32 @@ sito/
 
 Con più libri, il passo 2 si ripete per ogni cartella di `libri/`.
 
+Da un altro progetto gli stessi passi sono `npx leggio prepara`, `npx leggio sito` e `npx leggio prova`: vedi sotto.
+
 Serve solo Node.js 18 o successivo. `prepara.js` usa anche ffmpeg per comprimere l'audio; con `"ffmpeg": false` copia l'audio com'è e non serve.
+
+## Integrare Leggio in un sito che esiste già
+
+Leggio non tocca i dati: i capitoli li prepari come vuoi, anche con i tuoi script, e Leggio ci mette sopra il lettore. In un altro progetto si installa come strumento:
+
+```bash
+npm install --save-dev github:maxeo/leggio
+npx leggio sito docs
+```
+
+`leggio sito` scrive `index.html`, `sw.js`, `manifest.webmanifest`, `caratteri/` e le icone nella cartella del sito e lascia il resto com'è: basta che ci sia un `libro.json` (un libro solo) oppure un `catalogo.json` (scaffale). Per aggiornare il lettore: `npm update leggio` e di nuovo `npx leggio sito docs`.
+
+Il sito di un libro solo tiene tutto in una cartella:
+
+```
+docs/
+  libro.json        titolo, autore, chiave, modo
+  capitoli.json     indice dei capitoli
+  audio/NNN.mp3     testi/NNN.json
+  index.html, sw.js, manifest.webmanifest, icona.svg, caratteri/   <- leggio sito
+```
+
+In un sito già pubblicato la `chiave` di `libro.json` deve restare quella del lettore di prima: dà il nome ai progressi salvati nel browser, e cambiarla li fa perdere ai lettori. Il service worker ripulisce da sé le vecchie cache del lettore, mentre i capitoli salvati sul dispositivo restano se la chiave non cambia.
 
 ## catalogo.json
 

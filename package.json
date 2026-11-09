@@ -1,0 +1,14 @@
+{
+  "name": "leggio",
+  "version": "1.0.0",
+  "description": "Lettore web di audiolibri con il testo sincronizzato: sito statico, uno o piu' libri.",
+  "license": "MIT",
+  "author": "Matteo Burbui",
+  "homepage": "https://github.com/maxeo/leggio",
+  "repository": { "type": "git", "url": "git+https://github.com/maxeo/leggio.git" },
+  "keywords": ["audiolibro", "audiobook", "lettore", "reader", "sincronizzato", "pwa", "italiano"],
+  "bin": { "leggio": "strumenti/leggio.js" },
+  "files": ["lettore", "strumenti", "README.md", "LICENSE"],
+  "engines": { "node": ">=18" },
+  "scripts": { "prova": "node strumenti/server.js" }
+}
