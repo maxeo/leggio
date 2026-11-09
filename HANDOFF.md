@@ -12,6 +12,8 @@ Richiesta dell'utente: un nuovo repository con il lettore generalizzato, da prov
 
 Richiesta successiva: un livello in più per scegliere il libro, con i libri presi da un **catalogo remoto**, e il lettore deve reggere anche libri di **solo audio** e di **solo testo**. Fatto; i libri di prova vengono da LibriVox e Project Gutenberg.
 
+Richiesta successiva: lo strumento deve essere **facile da integrare** in un altro progetto e usabile **con un libro solo**, e il sito del romanzo su GitHub Pages deve usare Leggio invece del suo vecchio lettore. Fatto: c'è `package.json` con il comando `leggio`, e `C:\Users\matteo\Documents\FFXII - Romanzo\docs` ora è generato da Leggio.
+
 ## Regole dell'utente
 
 - Commit solo su richiesta: messaggio in italiano, prima riga al passato e lunga al massimo 60 caratteri, **mai `Co-Authored-By`**. Mai force-push. Niente push finché l'utente non lo dice.
@@ -24,6 +26,8 @@ Richiesta successiva: un livello in più per scegliere il libro, con i libri pre
 
 Il lettore legge più libri da `catalogo.json`, anche da un altro dominio, e ogni libro ha un modo: `sincronizzato`, `audio`, `testo`. Con un libro solo il sito resta com'era, senza scaffale. I dettagli dei formati stanno nel README.
 
+- **`package.json`:** il pacchetto si installa in un altro progetto con `npm install --save-dev github:maxeo/leggio` e porta il comando `leggio`, cioè `strumenti/leggio.js`: `leggio prepara`, `leggio sito` e `leggio prova` lanciano i tre script con gli stessi argomenti. `files` pubblica solo `lettore/` e `strumenti/` (250 KB). Licenza MIT in `LICENSE`.
+- **Il romanzo usa Leggio:** in `C:\Users\matteo\Documents\FFXII - Romanzo` c'è `docs/libro.json` con la chiave **`alba`**, quella del vecchio lettore, così i lettori non perdono i progressi già salvati; i vecchi badge dei traguardi di tempo restano in `alba-stato-v1` ma ora contano quelli generali. `Audiolibro/pubblica.js` scrive i dati e poi lancia `crea-sito.js`, cercandolo in `$LEGGIO`, `node_modules/leggio` e `../leggio`. `docs/` non ha le icone PNG: `crea-sito.js` non tocca l'icona del sito quando è diversa dalla sua, quindi l'icona di Dalmasca resta.
 - **`lettore/`:** il modello del lettore.
   - `index.html` ha i segnaposto `{{titolo}}`, `{{lingua}}`, `{{descrizione}}`, `{{sottotitolo}}`, `{{avviso}}`, `{{libro}}`, `{{iconaPiccola}}` e `{{iconaTouch}}`. Con un catalogo `{{libro}}` vale `null`.
   - `sw.js` ha `{{chiave}}` e `{{fileIcone}}`. La cache ora si chiama `-shell-v4` e tiene le cache `<chiave del libro>-audio-v1` di tutti i libri.
