@@ -1,0 +1,7 @@
+{
+  "titolo": "I promessi sposi",
+  "autore": "Alessandro Manzoni",
+  "chiave": "prova-promessi",
+  "modo": "testo",
+  "sorgenti": { "capitoli": "../../../sorgenti-promessi/capitoli" }
+}

@@ -1,0 +1,13 @@
+{
+  "titolo": "Divina Commedia. Inferno, canto I",
+  "autore": "Dante Alighieri",
+  "chiave": "prova-inferno-1",
+  "modo": "sincronizzato",
+  "sorgenti": {
+    "capitoli": "../../../sorgenti-inferno/capitoli",
+    "audio": "../../../sorgenti-inferno/audio",
+    "letto": "../../../sorgenti-inferno/letto",
+    "parole": "../../../sorgenti-inferno/parole",
+    "ffmpeg": false
+  }
+}

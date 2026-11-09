@@ -1,0 +1,55 @@
+{
+  "titolo": "Leggio",
+  "titoloBreve": "Leggio",
+  "sottotitolo": "Esempio del lettore: libri sincronizzati, di solo audio e di solo testo, anche presi da altri siti.",
+  "descrizione": "Esempio del lettore Leggio: audiolibri con il testo sincronizzato.",
+  "lingua": "it",
+  "chiave": "leggio-prova",
+  "avviso": "Esempio del lettore <a href=\"https://github.com/maxeo/leggio\" style=\"color:inherit\">Leggio</a>. Testi e registrazioni di pubblico dominio da Project Gutenberg e LibriVox.",
+  "libri": [
+    {
+      "chiave": "prova-alba",
+      "base": "https://maxeo.github.io/ultima-alba-di-dalmasca/",
+      "titolo": "L'ultima alba di Dalmasca",
+      "autore": "Romanzo di fan tratto da Final Fantasy XII",
+      "sottotitolo": "Audiolibro con il testo sincronizzato, letto dal sito pubblicato.",
+      "modo": "sincronizzato",
+      "avviso": "Opera di fan, non ufficiale e non commerciale. Voce sintetica. I file arrivano da maxeo.github.io.",
+      "traguardi": {
+        "primaParte": "Il crepuscolo",
+        "fine": "L'ultima alba"
+      }
+    },
+    {
+      "chiave": "prova-pinocchio-audio",
+      "base": "libri/pinocchio-audio/",
+      "titolo": "Le avventure di Pinocchio",
+      "autore": "Carlo Collodi · letto da Simona, LibriVox",
+      "sottotitolo": "Audiolibro senza testo.",
+      "modo": "audio",
+      "avviso": "Registrazione di pubblico dominio da LibriVox."
+    },
+    {
+      "chiave": "prova-promessi",
+      "base": "libri/promessi-sposi/",
+      "titolo": "I promessi sposi",
+      "autore": "Alessandro Manzoni",
+      "sottotitolo": "Libro da leggere, senza audio: 38 capitoli.",
+      "modo": "testo",
+      "avviso": "Testo di pubblico dominio da Project Gutenberg (ebook 45334)."
+    },
+    {
+      "chiave": "prova-inferno-1",
+      "base": "libri/inferno-canto-1/",
+      "titolo": "Divina Commedia. Inferno, canto I",
+      "autore": "Dante Alighieri",
+      "sottotitolo": "Un canto solo, letto dalla sintesi vocale, con il testo che segue parola per parola.",
+      "modo": "sincronizzato",
+      "avviso": "Testo di pubblico dominio da Project Gutenberg (ebook 1012). Voce sintetica.",
+      "traguardi": {
+        "primaParte": "Nella selva oscura",
+        "fine": "A riveder le stelle"
+      }
+    }
+  ]
+}
