@@ -8,7 +8,7 @@ Leggio è il lettore web dell'audiolibro di «L'ultima alba di Dalmasca», reso 
 
 È una PWA statica: testo con evidenziazione della frase e della parola lette, uso offline e installazione sul telefono.
 
-Richiesta dell'utente: un nuovo repository con il lettore generalizzato, da provare in locale. **Non va ancora spinto su GitHub.** Serve anche un'icona con un nome migliore: il nome scelto è «Leggio».
+Richiesta dell'utente: un nuovo repository con il lettore generalizzato, da provare in locale. Serve anche un'icona con un nome migliore: il nome scelto è «Leggio».
 
 Richiesta successiva: un livello in più per scegliere il libro, con i libri presi da un **catalogo remoto**, e il lettore deve reggere anche libri di **solo audio** e di **solo testo**. Fatto; i libri di prova vengono da LibriVox e Project Gutenberg.
 
@@ -22,7 +22,7 @@ Richiesta successiva: lo strumento deve essere **facile da integrare** in un alt
 
 ## Stato attuale
 
-`C:\Users\matteo\Documents\leggio` è un repository git con i commit. `.gitignore` esclude `prova/`, `node_modules/` e `icone/gen*/` (40 MB di mosaici generati: se vanno tenuti, chiedere all'utente). Niente push: il repository su GitHub non esiste ancora.
+`C:\Users\matteo\Documents\leggio` è un repository git con i commit. `.gitignore` esclude `prova/`, `node_modules/` e `icone/gen*/` (40 MB di mosaici generati: se vanno tenuti, chiedere all'utente). È pubblicato su https://github.com/maxeo/leggio (pubblico, licenza MIT), rilascio `v1.0.0`.
 
 Il lettore legge più libri da `catalogo.json`, anche da un altro dominio, e ogni libro ha un modo: `sincronizzato`, `audio`, `testo`. Con un libro solo il sito resta com'era, senza scaffale. I dettagli dei formati stanno nel README.
 
