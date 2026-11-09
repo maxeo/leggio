@@ -44,9 +44,10 @@ Il lettore legge più libri da `catalogo.json`, anche da un altro dominio, e ogn
 - **`prova/`:** siti di prova, non tracciati.
   - `prova/sito` contiene i capitoli 1-3 del romanzo, come libro solo: porta 8780.
   - `prova/semplice/sito` è un libro senza parti: porta 8781.
-  - `prova/scaffale` è lo scaffale di prova: porta 8782, 726 KB perché quasi niente sta in locale. I libri sono quattro: Dalmasca (sincronizzato, `base` su `https://maxeo.github.io/ultima-alba-di-dalmasca/`, 113 capitoli), Pinocchio solo audio (da archive.org), Pinocchio solo testo (locale) e il canto I dell'Inferno (sincronizzato, generato qui).
+  - `prova/scaffale` è lo scaffale di prova: porta 8782, 12 MB, di cui 10 sono l'audio del canto generato qui; il resto sta su altri siti. I libri sono quattro: Dalmasca (sincronizzato, `base` su `https://maxeo.github.io/ultima-alba-di-dalmasca/`, 113 capitoli), Pinocchio solo audio (da archive.org), I promessi sposi solo testo (locale, 38 capitoli) e il canto I dell'Inferno (sincronizzato, generato qui).
   - `libri/pinocchio-audio` non ha audio in locale: il suo `capitoli.json` punta ai 36 file di `https://archive.org/details/avventure_pinocchio_librivox` («Le avventure di Pinocchio» lette da Simona, pubblico dominio), ed è costruito con `prova/da-archive.py`. Provato: si ascolta e si salva sul dispositivo; archive.org serve CORS `*`, `Accept-Ranges` e 206.
-  - `prova/sorgenti-pinocchio-testo`: il testo da Project Gutenberg, ebook 52484, e i capitoli ricavati con `prova/da-gutenberg.py`.
+  - `prova/sorgenti-promessi`: «I promessi sposi» da Project Gutenberg, ebook 45334, con i capitoli ricavati da `prova/da-gutenberg.py`. Lo script riconosce due modi di scrivere i capitoli: il numero romano da solo, e allora la riga dopo è il titolo del capitolo (Pinocchio), oppure «CAPITOLO III.», e allora il capitolo si chiama «Capitolo 3» perché un titolo suo non ce l'ha (Manzoni).
+  - `prova/sorgenti-inferno`: il canto I generato qui. L'audio viene da `tts.sh` del romanzo (7 minuti, 10 MB, nessuna compressione perché `"ffmpeg": false`), i tempi delle parole da `controlla.sh`, cioè Whisper, copiati in `parole/001-canto-1.parole.json`. `prepara.js` dice «testo esatto»: le 137 righe lette combaciano con i 137 versi. Provato nel browser: la frase si illumina e dentro la frase la parola letta in quel momento.
   - `prova/sorgenti-inferno`: la Divina Commedia da Project Gutenberg, ebook 1012, e il canto I ricavato con `prova/da-commedia.py` (un verso per paragrafo, più il testo per la sintesi in `letto/`). L'audio si genera con la catena di FFXII (`Audiolibro/tts.sh`) e i tempi delle parole con `Audiolibro/controlla.sh`.
   - I server si avviano con `node strumenti/server.js prova/scaffale 8782`. Non ci sono launch.json in questo repository.
   - In `prova/sito` restano anche file di lavoro dell'icona: `parziale*.svg`, `combinato.svg`, `confronto.html` e simili. Si possono cancellare.
@@ -72,6 +73,7 @@ L'utente ha approvato l'icona: «mi piace come è adesso». Ha chiesto lui sia i
 
 - `sincronizzato`: come prima, audio e testo che si seguono.
 - `audio`: niente `testi/`, niente pulsante del testo; i capitoli sono i file mp3 e il titolo viene dal nome del file.
+- I traguardi di tempo, serie, giorni e libri finiti sono generali e stanno in `stato.trofei`, salvato con le impostazioni comuni; quelli dei capitoli restano per libro in `stato.traguardi`. Chi aveva già preso un traguardo di tempo su un libro lo ritrova nel tab generale solo quando lo rifa sullo scaffale: i vecchi badge per libro restano salvati ma non si mostrano più.
 - `testo`: niente lettore audio; la pagina del testo è la lettura, la posizione è la frazione di pagina scorsa (si salva 400 ms dopo che lo scorrimento si ferma, e oltre il 98% il capitolo è letto) e il tempo passato a leggere conta come ascolto per i traguardi.
 
 ## Cosa non ha funzionato (non ripetere)

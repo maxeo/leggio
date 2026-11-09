@@ -18,6 +18,8 @@ Nello scaffale ci sono la ricerca per titolo e autore, i filtri per modo (compai
 
 Funzioni: elenco dei capitoli diviso in parti, testo che segue la voce, velocità, salti avanti e indietro, timer di spegnimento, segnalibri, capitoli salvati sul dispositivo, temi chiaro e scuro, traguardi, esportazione e importazione dei progressi. I progressi stanno per libro; tema, carattere e comandi valgono per tutto lo scaffale.
 
+I traguardi sono divisi in due tab. **Libri in corso** chiede prima quale libro guardare e poi mostra i traguardi dei suoi capitoli, con i nomi scelti dal libro in `traguardi`: dentro un libro quello aperto è già scelto. **Generali** conta il tempo, i giorni di fila e i libri finiti di tutto lo scaffale, sommando i progressi di ogni libro, e sta con le impostazioni invece che con un libro. Senza un libro aperto parte il tab Generali, dentro un libro quello dei libri in corso.
+
 Nato per [L'ultima alba di Dalmasca](https://maxeo.github.io/ultima-alba-di-dalmasca/).
 
 ## Struttura

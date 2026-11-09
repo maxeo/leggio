@@ -52,6 +52,7 @@ h1 { font: 500 clamp(32px, 8vw, 50px)/1.08 var(--serif); margin: 0 0 8px; text-w
 nav.filtri { display: flex; gap: 8px; overflow-x: auto; padding: 22px 0 6px; scrollbar-width: none; }
 nav.filtri button { white-space: nowrap; padding: 7px 13px; border: 1px solid var(--linea); border-radius: 999px; font-size: 14px; color: var(--tenue); min-height: 38px; }
 nav.filtri button[aria-pressed="true"] { background: var(--testo); color: var(--sfondo); border-color: var(--testo); }
+nav.filtri .sep { flex: 0 0 1px; background: var(--linea); margin: 6px 3px; }
 details.parte { border-bottom: 1px solid var(--linea); }
 details.parte summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 16px 0; font: 500 20px/1.25 var(--serif); }
 details.parte summary::-webkit-details-marker { display: none; }
@@ -251,6 +252,12 @@ label.spunta input { -webkit-appearance: none; appearance: none; position: relat
 label.spunta input::before { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--pannello); box-shadow: 0 1px 2px #0005; transition: transform .15s; }
 label.spunta input:checked { background: var(--accento); }
 label.spunta input:checked::before { transform: translateX(18px); }
+.tabs { display: flex; gap: 6px; margin: 2px 0 12px; padding: 3px; background: var(--rilievo); border-radius: 12px; }
+.tabs button { flex: 1; min-width: 0; min-height: 38px; padding: 8px 10px; border-radius: 9px; font-size: 14px; color: var(--tenue); }
+.tabs button[aria-selected="true"] { background: var(--pannello); color: var(--testo); box-shadow: 0 1px 3px rgba(0, 0, 0, .18); }
+.trag-scelta { margin: 2px 0 10px; }
+.trag-scelta select { width: 100%; min-height: 42px; padding: 0 8px; background: var(--pannello); border: 1px solid var(--linea); border-radius: 10px; color: var(--testo); font-size: 14px; }
+.trag-libro { margin: 16px 0 6px; }
 .trag-numeri { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 2px 0 6px; }
 .trag-numeri div { position: relative; padding: 10px 12px; background: var(--rilievo); border-radius: 10px; min-width: 0; }
 .trag-numeri svg.ic { position: absolute; top: 10px; right: 10px; width: 18px; height: 18px; color: var(--tenue); }
@@ -469,13 +476,14 @@ const $ = id => document.getElementById(id);
 const a = $('a');
 // Le impostazioni valgono per tutti i libri; progressi, segnalibri e traguardi stanno per libro.
 const CH_UI = 'leggio-impostazioni-v1';
-const COMUNI = ['ui', 'tema', 'dim', 'velocita', 'aperti'];
+const COMUNI = ['ui', 'tema', 'dim', 'velocita', 'aperti', 'trofei'];
 let CHIAVE = '', CACHE = '';
 const leggi = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
 const UI_BASE = { accento: 'ambra', evid: 38, parole: false, allinea: 'justify', font: 'serif', inter: 1.6, indietro: [15], avanti: [30], continua: true, scambia: false, autoRiga: true, nascosti: ['scarica-file'], scaricaNascosto: true, notteOn: false, notte: 50, noBarra: false, noIcone: false, noAvanz: false, noTitolo: false, vista: 'carte', ordine: 'catalogo' };
 const normalizzaCap = cap => { Object.values(cap).forEach(s => { if (s.ascoltati == null) s.ascoltati = s.pos > 5 ? s.pos : 0; if (s.giro == null) s.giro = s.ascoltati; if (s.finito == null) s.finito = !!s.fatto; else if (s.sentito == null) s.finito = false; if (s.sentito == null) s.sentito = []; }); };
 // "aperti" tiene quando ogni libro e' stato aperto l'ultima volta: serve all'ordine dello scaffale.
-const vuoto = () => ({ cap: {}, segni: [], ultimo: null, velocita: 1, dim: 19, tema: null, giorni: {}, notte: 0, alba: 0, traguardi: {}, aperti: {} });
+// "trofei" sono i traguardi generali: valgono per tutto lo scaffale, non per un libro solo.
+const vuoto = () => ({ cap: {}, segni: [], ultimo: null, velocita: 1, dim: 19, tema: null, giorni: {}, notte: 0, alba: 0, traguardi: {}, aperti: {}, trofei: {} });
 let stato = vuoto();
 function sistemaStato() {
   if (stato.ui && !stato.ui.scaricaNascosto) stato.ui.nascosti = [...(stato.ui.nascosti || []), 'scarica-file'];
@@ -529,11 +537,12 @@ const pronti = () => capitoli.filter(c => prontoCap(c));
 const sc = n => stato.cap[n] || (stato.cap[n] = { pos: 0, fatto: false, ascoltati: 0, giro: 0, finito: false, sentito: [] });
 // Dove sta il file del capitolo: di solito "audio/001.mp3" dentro la cartella del libro, ma il capitolo
 // puo' anche indicare il suo file con "file" (audio) o "testo", pure su un altro sito.
-const percorso = (c, cart, est) => {
+const percorsoIn = (base, c, cart, est) => {
   const suo = cart === 'audio' ? c.file : c.testo;
-  return suo ? new URL(suo, new URL(BASE || './', location.href)).href
-    : `${BASE}${cart}/${String(c.n).padStart(3, '0')}.${est}`;
+  return suo ? new URL(suo, new URL(base || './', location.href)).href
+    : `${base}${cart}/${String(c.n).padStart(3, '0')}.${est}`;
 };
+const percorso = (c, cart, est) => percorsoIn(BASE, c, cart, est);
 const assoluto = p => new URL(p, location.href).href;
 
 function annuncia(t) {
@@ -1486,6 +1495,51 @@ function spunta(testo, attiva, fn, ic) {
 }
 const testoSalto = s => s <= 60 || s % 60 ? String(s) : s / 60 + 'm';
 const altroAperto = {};
+// Dallo scaffale i capitoli salvati si contano libro per libro: ogni libro ha la sua cache.
+async function libriSalvati() {
+  if (!('caches' in window)) return null;
+  const fuori = [];
+  for (const v of (CATALOGO ? CATALOGO.libri : [])) {
+    const nome = v.chiave + '-audio-v1';
+    if (!(await caches.has(nome))) continue;
+    const avuti = new Set((await (await caches.open(nome)).keys()).map(r => r.url));
+    if (!avuti.size) continue;
+    const m = modoDi(v), cart = m === 'testo' ? 'testi' : 'audio', est = m === 'testo' ? 'json' : 'mp3';
+    const dentro = (v.dati?.capitoli || []).filter(c => avuti.has(assoluto(percorsoIn(v.base || '', c, cart, est))));
+    fuori.push({ v, nome, quanti: dentro.length || avuti.size, byte: dentro.reduce((x, c) => x + (c.byte || 0), 0) });
+  }
+  return fuori;
+}
+async function riempiOffScaffale(box) {
+  const lista = await libriSalvati();
+  if (!lista) return box.replaceChildren(el('p', { class: 'nota' }, 'Questo browser non salva i capitoli sul dispositivo.'));
+  const totCap = lista.reduce((x, r) => x + r.quanti, 0), totByte = lista.reduce((x, r) => x + r.byte, 0);
+  const libero = el('p', { class: 'nota' });
+  if (navigator.storage?.estimate) navigator.storage.estimate().then(t => { if (t.quota) libero.textContent = `Spazio ancora disponibile per il browser: circa ${mb(t.quota - (t.usage || 0))}.`; }).catch(() => {});
+  const riga = r => {
+    const b = el('button', { class: 'dati-voce', onclick: () => {
+      b.replaceWith(el('div', { class: 'dati-conferma' }, el('p', {}, `Togliere dal dispositivo ${testoCapitoli(r.quanti)} di «${r.v.titolo}»? I progressi restano.`),
+        el('div', {}, el('button', { class: 'si', onclick: async () => { await caches.delete(r.nome); if (r.v.chiave === libroAperto) { salvati.clear(); disegna(); } annuncia(`Tolti dal dispositivo: ${testoCapitoli(r.quanti)}.`); riempiOffScaffale(box); } }, 'Togli'),
+          el('button', { onclick: () => riempiOffScaffale(box) }, 'Annulla'))));
+    } }, icona(ICONA_MODO[modoDi(r.v)] || 'i-libro'),
+      el('span', {}, el('b', {}, r.v.titolo), el('small', {}, `${testoCapitoli(r.quanti)}${r.byte ? ', ' + mb(r.byte) : ''} · tocca per liberare lo spazio`)));
+    return b;
+  };
+  box.replaceChildren(...[
+    el('div', { class: 'trag-numeri' },
+      el('div', {}, el('b', {}, String(totCap)), el('small', {}, 'Capitoli salvati')),
+      el('div', {}, el('b', {}, mb(totByte)), el('small', {}, 'Spazio occupato'))),
+    lista.length ? el('h3', {}, 'Libri sul dispositivo') : el('p', { class: 'nota' }, 'Nessun capitolo salvato. Apri un libro e salva i capitoli che ti servono senza rete.'),
+    ...lista.map(riga),
+    libero
+  ].filter(Boolean));
+}
+function corpoOffScaffale() {
+  const box = el('div', {}, el('p', { class: 'nota' }, 'Conto i capitoli salvati…'));
+  riempiOffScaffale(box);
+  return box;
+}
+
 // Accetta 90, -90, 5*60, 5x60, 1,5*60: il segno non conta, la direzione la dà il gruppo
 function leggiSecondi(t) {
   const pezzi = t.trim().replace(/^[-−+] */, '').split(/ *[*x×] */i);
@@ -1536,49 +1590,111 @@ function registraGiorno(d) {
   if (ora < 5) stato.notte += d;
   else if (ora < 7) stato.alba += d;
 }
-function statistiche() {
-  const finito = c => !!stato.cap[c.n]?.finito;
-  const giorni = Object.keys(stato.giorni).filter(k => stato.giorni[k] >= 60).map(numeroGiorno).sort((x, y) => x - y);
+// Giorni attivi, serie in corso, serie migliore e giorno record da una mappa giorno -> secondi.
+function serieDa(giorni) {
+  const attivi = Object.keys(giorni).filter(k => giorni[k] >= 60).map(numeroGiorno).sort((x, y) => x - y);
   let corsa = 0, migliore = 0, prima = null;
-  for (const g of giorni) { corsa = g === prima + 1 ? corsa + 1 : 1; prima = g; migliore = Math.max(migliore, corsa); }
+  for (const g of attivi) { corsa = g === prima + 1 ? corsa + 1 : 1; prima = g; migliore = Math.max(migliore, corsa); }
   const oggi = numeroGiorno(chiaveGiorno(new Date()));
   return {
+    attivi: attivi.length,
+    serie: prima !== null && oggi - prima <= 1 ? corsa : 0,
+    migliore,
+    record: Math.max(0, ...Object.values(giorni))
+  };
+}
+function statistiche() {
+  const finito = c => !!stato.cap[c.n]?.finito;
+  return Object.assign({
     totale: Object.values(stato.cap).reduce((t, s) => t + (s.ascoltati || 0), 0),
     finiti: capitoli.filter(finito).length,
     capitoli: capitoli.length,
     prologo: capitoli.filter(c => c.parte === parti[0]).filter(finito).length,
-    capitoliPrologo: capitoli.filter(c => c.parte === parti[0]).length,
-    attivi: giorni.length,
-    serie: prima !== null && oggi - prima <= 1 ? corsa : 0,
-    migliore,
-    record: Math.max(0, ...Object.values(stato.giorni))
-  };
+    capitoliPrologo: capitoli.filter(c => c.parte === parti[0]).length
+  }, serieDa(stato.giorni));
+}
+// Le stesse statistiche per un libro qualsiasi dello scaffale, prese dai suoi progressi salvati.
+// Il libro aperto ha i dati freschi in memoria, quindi per quello vale statistiche().
+function statLibro(v) {
+  if (v.chiave === libroAperto && capitoli.length) return statistiche();
+  const s = leggi(v.chiave + '-stato-v1'), cap = s.cap || {};
+  const caps = v.dati?.capitoli || [], prima = (v.dati?.parti || [])[0];
+  const finito = c => !!cap[c.n]?.finito;
+  return Object.assign({
+    totale: Object.values(cap).reduce((t, x) => t + (x.ascoltati || 0), 0),
+    finiti: caps.filter(finito).length,
+    capitoli: caps.length,
+    prologo: prima ? caps.filter(c => c.parte === prima).filter(finito).length : 0,
+    capitoliPrologo: prima ? caps.filter(c => c.parte === prima).length : 0
+  }, serieDa(s.giorni || {}));
+}
+// Lo scaffale intero: tempo, giorni, libri finiti. I giorni dei libri si sommano fra loro.
+function statGenerali() {
+  const libri = CATALOGO ? CATALOGO.libri : [];
+  const giorni = {};
+  let totale = 0, notte = 0, alba = 0, fatti = 0, iniziati = 0, capFiniti = 0, conIndice = 0;
+  for (const v of libri) {
+    const st = statLibro(v);
+    const s = v.chiave === libroAperto ? stato : leggi(v.chiave + '-stato-v1');
+    totale += st.totale;
+    capFiniti += st.finiti;
+    notte += s.notte || 0;
+    alba += s.alba || 0;
+    for (const [k, n] of Object.entries(s.giorni || {})) giorni[k] = (giorni[k] || 0) + n;
+    if (st.totale > 0 || st.finiti > 0) iniziati++;
+    if (st.capitoli) { conIndice++; if (st.finiti >= st.capitoli) fatti++; }
+  }
+  return Object.assign({ totale, notte, alba, libri: fatti, iniziati, capFiniti, libriTot: conIndice || libri.length },
+    serieDa(giorni));
 }
 const ORA = 3600;
-// I traguardi portano i nomi scelti dal libro e il verbo del modo: si ascolta, oppure si legge.
+// I traguardi di un libro riguardano i suoi capitoli e portano i nomi scelti dal libro.
+// Tempo, serie e giorni valgono invece per tutto lo scaffale: stanno in TRAGUARDI_GEN.
 let TRAGUARDI = [];
-function creaTraguardi() {
-  const leggo = MODO === 'testo';
-  const v = leggo ? 'Leggi' : 'Ascolta';
-  const t = LIBRO.traguardi || {};
-  TRAGUARDI = [
+function traguardiDi(nomi, dueParti) {
+  const t = nomi || {};
+  return [
     ['first', 'Primo capitolo', 'Finisci un capitolo', st => [st.finiti, 1], 'i-segno'],
-    ['prologue', t.primaParte || 'La prima parte', 'Finisci la prima parte', st => [st.prologo, st.capitoliPrologo || 1], 'i-libro'],
+    ...(dueParti ? [['prologue', t.primaParte || 'La prima parte', 'Finisci la prima parte', st => [st.prologo, st.capitoliPrologo || 1], 'i-libro']] : []),
     ['halfway', 'A metà strada', 'Finisci metà dei capitoli', st => [st.finiti, Math.ceil(st.capitoli / 2) || 1], 'i-meta'],
-    ['finale', t.fine || "Fino all'ultima pagina", 'Finisci tutti i capitoli', st => [st.finiti, st.capitoli || 1], 'i-trofeo'],
-    ['hour1', 'La prima ora', `${v} per 1 ora`, st => [st.totale, ORA], leggo ? 'i-testo' : 'i-cuffie'],
-    ['hour10', 'Dieci ore', `${v} per 10 ore`, st => [st.totale, 10 * ORA], 'i-timer'],
-    ['hour24', 'Un giorno intero', `${v} per 24 ore`, st => [st.totale, 24 * ORA], 'i-clessidra'],
-    ['streak3', 'Tre giorni di fila', `${v} per 3 giorni di fila`, st => [st.migliore, 3], 'i-fiamma'],
-    ['streak7', 'Una settimana di fila', `${v} per 7 giorni di fila`, st => [st.migliore, 7], 'i-fiamma'],
-    ['streak30', 'Un mese di fila', `${v} per 30 giorni di fila`, st => [st.migliore, 30], 'i-calendario'],
-    ['marathon', 'Maratona', `${v} per 3 ore in un giorno`, st => [st.record, 3 * ORA], 'i-velocita'],
-    ['night', 'Nottambulo', `${v} per 1 ora tra mezzanotte e le 5`, () => [stato.notte, ORA], 'i-luna'],
-    ['dawn', "Prima dell'alba", `${v} per 30 minuti tra le 5 e le 7`, () => [stato.alba, ORA / 2], 'i-alba']
+    ['finale', t.fine || "Fino all'ultima pagina", 'Finisci tutti i capitoli', st => [st.finiti, st.capitoli || 1], 'i-trofeo']
   ];
-  if (parti.length < 2) TRAGUARDI.splice(TRAGUARDI.findIndex(x => x[0] === 'prologue'), 1);
+}
+function creaTraguardi() { TRAGUARDI = traguardiDi(LIBRO.traguardi, parti.length > 1); }
+const TRAGUARDI_GEN = [
+  ['hour1', 'La prima ora', "Un'ora fra lettura e ascolto", st => [st.totale, ORA], 'i-timer'],
+  ['hour10', 'Dieci ore', 'Dieci ore in tutto', st => [st.totale, 10 * ORA], 'i-timer'],
+  ['hour24', 'Un giorno intero', 'Ventiquattro ore in tutto', st => [st.totale, 24 * ORA], 'i-clessidra'],
+  ['streak3', 'Tre giorni di fila', 'Tre giorni di fila con almeno un minuto', st => [st.migliore, 3], 'i-fiamma'],
+  ['streak7', 'Una settimana di fila', 'Sette giorni di fila', st => [st.migliore, 7], 'i-fiamma'],
+  ['streak30', 'Un mese di fila', 'Trenta giorni di fila', st => [st.migliore, 30], 'i-calendario'],
+  ['marathon', 'Maratona', 'Tre ore in un giorno solo', st => [st.record, 3 * ORA], 'i-velocita'],
+  ['night', 'Nottambulo', "Un'ora tra mezzanotte e le 5", st => [st.notte, ORA], 'i-luna'],
+  ['dawn', "Prima dell'alba", "Mezz'ora tra le 5 e le 7", st => [st.alba, ORA / 2], 'i-alba'],
+  ['book1', 'Il primo libro', 'Finisci un libro', st => [st.libri, 1], 'i-libro'],
+  ['book3', 'Tre libri', 'Finisci tre libri', st => [st.libri, 3], 'i-trofeo'],
+  ['shelf', 'Tutto lo scaffale', 'Finisci ogni libro dello scaffale', st => [st.libri, st.libriTot || 1], 'i-trofeo']
+];
+// Con pochi libri certi traguardi non hanno senso: "Tre libri" ne vuole almeno tre.
+const traguardiGen = () => {
+  const n = CATALOGO ? CATALOGO.libri.length : 1;
+  return TRAGUARDI_GEN.filter(([id]) => id === 'book3' ? n >= 3 : id === 'shelf' ? n >= 2 : true);
+};
+// I traguardi generali stanno con le impostazioni, non con i progressi di un libro.
+function verificaGenerali() {
+  if (!CATALOGO) return;
+  const st = statGenerali();
+  if (!stato.trofei) stato.trofei = {};
+  const t = stato.trofei, lista = traguardiGen();
+  lista.forEach(([id, , , val]) => { const [v, o] = val(st); if (t[id] && v < o) delete t[id]; });
+  const nuovi = lista.filter(([id, , , val]) => { const [v, o] = val(st); return !t[id] && v >= o; });
+  if (!nuovi.length) return;
+  nuovi.forEach(([id]) => { t[id] = new Date().toISOString(); });
+  salvaStato();
+  annuncia(nuovi.length === 1 ? `Traguardo: ${nuovi[0][1]}` : `Nuovi traguardi: ${nuovi.length}`);
 }
 function verificaTraguardi() {
+  verificaGenerali();
   if (!capitoli.length || !TRAGUARDI.length) return;
   const st = statistiche();
   TRAGUARDI.forEach(([id, , , val]) => { const [v, o] = val(st); if (stato.traguardi[id] && v < o) delete stato.traguardi[id]; });
@@ -1590,12 +1706,16 @@ function verificaTraguardi() {
 }
 const tempoTesto = s => { const m = Math.floor(s / 60), o = Math.floor(m / 60); return o ? (m % 60 ? `${o} h ${m % 60} min` : `${o} h`) : `${m} min`; };
 const giorniTesto = n => n === 1 ? '1 giorno' : `${n} giorni`;
-const quantoTraguardo = (id, v, o) => /^(hour|marathon|night|dawn)/.test(id) ? `${tempoTesto(Math.min(v, o))} di ${tempoTesto(o)}`
-  : /^streak/.test(id) ? `${Math.min(v, o)} di ${giorniTesto(o)}`
-  : `${Math.min(v, o)} di ${testoCapitoli(o)}`;
+const libriTesto = n => n === 1 ? '1 libro' : `${n} libri`;
+// L'unita' del traguardo si capisce dal suo nome: tempo, giorni di fila, libri o capitoli.
+const unitaTraguardo = id => /^(hour|marathon|night|dawn)/.test(id) ? tempoTesto
+  : /^streak/.test(id) ? giorniTesto
+  : /^(book|shelf)/.test(id) ? libriTesto
+  : testoCapitoli;
+const quantoTraguardo = (id, v, o) => { const t = unitaTraguardo(id); return `${t === tempoTesto ? t(Math.min(v, o)) : Math.min(v, o)} di ${t(o)}`; };
 function righeTraguardo(id, v, o) {
   const tempo = /^(hour|marathon|night|dawn)/.test(id);
-  const testo = x => tempo ? tempoTesto(x) : /^streak/.test(id) ? giorniTesto(x) : testoCapitoli(x);
+  const testo = unitaTraguardo(id);
   const resto = testo(tempo ? Math.ceil(Math.max(0, o - v) / 60) * 60 : Math.max(0, o - v));
   return [['Finora', testo(Math.min(v, o))], ['Obiettivo', testo(o)], [/^1 [a-z]+$/.test(resto) ? 'Ti rimane' : 'Ti rimangono', resto]];
 }
@@ -1628,29 +1748,76 @@ function mostraTraguardo(nome, descr, ic, preso, quota, righe) {
   ].filter(Boolean));
   d.showModal();
 }
-function corpoTraguardi() {
-  verificaTraguardi();
-  const st = statistiche();
-  const numero = (v, t, ic) => el('div', {}, icona(ic), el('b', {}, v), el('small', {}, t));
-  const riga = ([id, nome, descr, val, ic]) => {
-    const preso = stato.traguardi[id], [v, o] = val(st);
-    return el('button', { class: 'traguardo' + (preso ? ' preso' : ''), onclick: () => mostraTraguardo(nome, descr, ic, preso, v / o, righeTraguardo(id, v, o)) }, icona(ic),
-      el('div', {}, el('b', {}, nome), el('small', {}, descr),
-        preso ? el('small', {}, 'Ottenuto il ' + new Date(preso).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })) : [barra(Math.min(100, v / o * 100)), el('small', { class: 'trag-quanto' }, quantoTraguardo(id, v, o))]));
-  };
-  const presi = TRAGUARDI.filter(([id]) => stato.traguardi[id]).length;
+const numeroTrag = (v, t, ic) => el('div', {}, icona(ic), el('b', {}, v), el('small', {}, t));
+// Una riga di traguardo: presi dice quali sono gia' ottenuti, st da' i valori da confrontare.
+const rigaTrag = (presi, st) => ([id, nome, descr, val, ic]) => {
+  const preso = presi[id], [v, o] = val(st);
+  return el('button', { class: 'traguardo' + (preso ? ' preso' : ''), onclick: () => mostraTraguardo(nome, descr, ic, preso, v / o, righeTraguardo(id, v, o)) }, icona(ic),
+    el('div', {}, el('b', {}, nome), el('small', {}, descr),
+      preso ? el('small', {}, 'Ottenuto il ' + new Date(preso).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })) : [barra(Math.min(100, v / o * 100)), el('small', { class: 'trag-quanto' }, quantoTraguardo(id, v, o))]));
+};
+const contaPresi = (lista, presi) => `Traguardi: ${lista.filter(([id]) => presi[id]).length} su ${lista.length}`;
+// Tab "Generali": tempo, giorni e libri finiti di tutto lo scaffale.
+function corpoGenerali() {
+  verificaGenerali();
+  const st = statGenerali(), presi = stato.trofei || {}, lista = traguardiGen();
   return [
     el('div', { class: 'trag-numeri' },
-      numero(tempoTesto(st.totale), MODO === 'testo' ? 'Tempo di lettura' : 'Tempo ascoltato', MODO === 'testo' ? 'i-testo' : 'i-cuffie'),
-      numero(`${st.finiti}/${st.capitoli}`, 'Capitoli finiti', 'i-libro'),
-      numero(giorniTesto(st.serie), 'Serie attuale', 'i-fiamma'),
-      numero(giorniTesto(st.migliore), 'Serie migliore', 'i-trofeo'),
-      numero(giorniTesto(st.attivi), MODO === 'testo' ? 'Giorni di lettura' : 'Giorni di ascolto', 'i-calendario'),
-      numero(tempoTesto(st.record), 'Giorno record', 'i-velocita')),
-    el('h3', {}, `Traguardi: ${presi} su ${TRAGUARDI.length}`),
-    TRAGUARDI.map(riga),
-    el('p', { class: 'nota' }, `Azzerare un capitolo non toglie il tempo ${MODO === 'testo' ? 'di lettura' : 'ascoltato'} né i traguardi. Conta dal momento in cui questo libro è arrivato, su questo browser.`)
+      numeroTrag(tempoTesto(st.totale), 'Tempo in tutto', 'i-timer'),
+      numeroTrag(`${st.libri}/${st.libriTot}`, 'Libri finiti', 'i-libro'),
+      numeroTrag(giorniTesto(st.serie), 'Serie attuale', 'i-fiamma'),
+      numeroTrag(giorniTesto(st.migliore), 'Serie migliore', 'i-trofeo'),
+      numeroTrag(giorniTesto(st.attivi), 'Giorni attivi', 'i-calendario'),
+      numeroTrag(tempoTesto(st.record), 'Giorno record', 'i-velocita')),
+    el('h3', {}, contaPresi(lista, presi)),
+    lista.map(rigaTrag(presi, st)),
+    el('p', { class: 'nota' }, 'Valgono per tutti i libri dello scaffale e contano su questo browser.')
   ];
+}
+// Tab "Libri in corso": prima si sceglie il libro, poi si vedono i traguardi dei suoi capitoli.
+// Dentro un libro quello aperto e' gia' scelto; dallo scaffale si parte dai libri iniziati.
+let libroTrag = null, ridisegnaTrag = () => {};
+function corpoInCorso() {
+  const libri = (CATALOGO ? CATALOGO.libri : []).filter(v => statoLibro(v) === 'corso' || v.chiave === libroAperto);
+  if (!libri.length) return [el('p', { class: 'nota' }, 'Nessun libro in corso: aprine uno e i suoi traguardi compaiono qui.')];
+  if (!libri.some(v => v.chiave === libroTrag)) libroTrag = libri.some(v => v.chiave === libroAperto) ? libroAperto : libri[0].chiave;
+  const v = libri.find(x => x.chiave === libroTrag);
+  const sel = el('select', { 'aria-label': 'Libro dei traguardi' }, libri.map(x => el('option', { value: x.chiave }, x.titolo)));
+  sel.value = libroTrag;
+  sel.onchange = () => { libroTrag = sel.value; ridisegnaTrag(); };
+  const suo = v.chiave === libroAperto;
+  const st = suo ? statistiche() : statLibro(v);
+  const presi = suo ? stato.traguardi : (leggi(v.chiave + '-stato-v1').traguardi || {});
+  const lista = suo ? TRAGUARDI : traguardiDi(v.traguardi, (v.dati?.parti || []).length > 1);
+  const testo = modoDi(v) === 'testo';
+  return [
+    libri.length > 1 ? el('div', { class: 'trag-scelta' }, sel) : null,
+    el('div', { class: 'trag-numeri' },
+      numeroTrag(tempoTesto(st.totale), testo ? 'Tempo di lettura' : 'Tempo ascoltato', testo ? 'i-testo' : 'i-cuffie'),
+      numeroTrag(`${st.finiti}/${st.capitoli}`, 'Capitoli finiti', 'i-libro'),
+      numeroTrag(giorniTesto(st.attivi), testo ? 'Giorni di lettura' : 'Giorni di ascolto', 'i-calendario'),
+      numeroTrag(tempoTesto(st.record), 'Giorno record', 'i-velocita')),
+    el('h3', {}, contaPresi(lista, presi)),
+    lista.map(rigaTrag(presi, st)),
+    suo ? el('p', { class: 'nota' }, `Azzerare un capitolo non toglie il tempo ${testo ? 'di lettura' : 'ascoltato'} né i traguardi. Conta dal momento in cui questo libro è arrivato, su questo browser.`) : null
+  ].filter(Boolean);
+}
+// Due tab: prima i libri in corso, poi i traguardi di tutto lo scaffale.
+let tabTrag = null;
+function corpoTraguardi() {
+  if (libroAperto) { tabTrag = 'libro'; libroTrag = libroAperto; }
+  else if (!tabTrag) tabTrag = 'generali';
+  const corpo = el('div', {});
+  const tab = el('div', { class: 'tabs', role: 'tablist' });
+  const disegna = () => {
+    [...tab.children].forEach(b => b.setAttribute('aria-selected', String(b.dataset.t === tabTrag)));
+    corpo.replaceChildren(...(tabTrag === 'generali' ? corpoGenerali() : corpoInCorso()).flat());
+  };
+  ridisegnaTrag = disegna;
+  tab.replaceChildren(...[['libro', 'Libri in corso'], ['generali', 'Generali']].map(([v, n]) =>
+    el('button', { role: 'tab', 'data-t': v, 'aria-selected': String(tabTrag === v), onclick: () => { tabTrag = v; disegna(); } }, n)));
+  disegna();
+  return [tab, corpo];
 }
 const DATI = document.querySelector('.pannello-dati');
 function sezione(id, ic, titolo, sotto, ...figli) {
@@ -1729,14 +1896,14 @@ function disegnaPannello() {
       scelte('Evidenziazione della frase', [[22, 'Leggera'], [38, 'Media'], [50, 'Forte']], u.evid, v => { u.evid = v; }),
       spunta('Segui anche parola per parola', !!u.parole, on => { u.parole = on; }, 'i-testo'),
       el('p', { class: 'nota' }, 'Dentro la frase evidenziata, la parola letta in quel momento ha un colore più marcato.')),
-    conLibro && MODO !== 'testo' ? sezione('ascolto', 'i-cuffie', 'Ascolto', 'Salti, capitolo successivo',
+    !conLibro || MODO !== 'testo' ? sezione('ascolto', 'i-cuffie', 'Ascolto', 'Salti, capitolo successivo',
       spunta('Passa da solo al capitolo successivo', u.continua, on => { u.continua = on; }, 'i-continua'),
       sotto('Salti'),
       el('p', { class: 'nota' }, 'Ogni valore spuntato diventa un pulsante. Ecco come appare ora il lettore:'),
       anteprimaSalti(),
       sceltaSalti('Indietro', 'indietro'),
       sceltaSalti('Avanti', 'avanti')) : null,
-    conLibro && MODO !== 'testo' ? sezione('lettore', 'i-barra', 'Lettore', 'Barre, pulsanti, disposizione',
+    !conLibro || MODO !== 'testo' ? sezione('lettore', 'i-barra', 'Lettore', 'Barre, pulsanti, disposizione',
       sotto('Barre'),
       spunta('Barra inferiore', !u.noBarra, on => { u.noBarra = !on; }, 'i-barra'),
       spunta('Titolo del capitolo', !u.noTitolo, on => { u.noTitolo = !on; }, 'i-testo'),
@@ -1751,11 +1918,16 @@ function disegnaPannello() {
       sotto('Disposizione'),
       spunta("Metti i pulsanti in linea finché c'è spazio", u.autoRiga, on => { u.autoRiga = on; }, 'i-riga'),
       spunta('Velocità a destra, testo a sinistra', u.scambia, on => { u.scambia = on; }, 'i-scambia')) : null,
-    conLibro ? sezione('traguardi', 'i-trofeo', 'Traguardi', MODO === 'testo' ? 'Tempo di lettura, serie, medaglie' : 'Tempo ascoltato, serie, medaglie', ...corpoTraguardi()) : null,
-    conLibro ? sezione('offline', 'i-scarica', MODO === 'testo' ? 'Lettura senza rete' : 'Ascolto senza rete', 'Capitoli salvati, spazio occupato', el('div', { id: 'offline-corpo' }, ...corpoOffline())) : null,
+    sezione('traguardi', 'i-trofeo', 'Traguardi', conLibro ? (MODO === 'testo' ? 'Tempo di lettura, serie, medaglie' : 'Tempo ascoltato, serie, medaglie') : 'Tempo, serie, libri finiti', ...corpoTraguardi()),
+    conLibro
+      ? sezione('offline', 'i-scarica', MODO === 'testo' ? 'Lettura senza rete' : 'Ascolto senza rete', 'Capitoli salvati, spazio occupato', el('div', { id: 'offline-corpo' }, ...corpoOffline()))
+      : sezione('offline', 'i-scarica', 'Senza rete', 'Capitoli salvati, spazio occupato', corpoOffScaffale()),
     conLibro ? sezione('progressi', 'i-esporta', 'Progressi', 'Esporta, importa', DATI) : null,
     el('div', { class: 'menu-piede' }, bottoneRipristina())
   ];
+  // Senza un libro aperto non ci sono progressi da esportare: la sezione sta nel markup,
+  // quindi va tolta a mano, altrimenti resta nel menu sotto il piede.
+  if (!conLibro) DATI.remove();
   $('pannello-corpo').replaceChildren(...voci.filter(Boolean));
 }
 document.querySelectorAll('[data-menu-btn]').forEach(b => { b.onclick = () => { disegnaPannello(); $('pannello').showModal(); }; });
@@ -1773,6 +1945,7 @@ const perEsporta = () => ({
   nightSeconds: stato.notte,
   dawnSeconds: stato.alba,
   badges: stato.traguardi,
+  shelfBadges: stato.trofei,
   speed: stato.velocita,
   fontSize: stato.dim,
   theme: stato.tema,
@@ -1788,7 +1961,8 @@ const daImportare = d => {
     ...(d.days ? { giorni: d.days } : {}),
     ...(d.nightSeconds != null ? { notte: +d.nightSeconds || 0 } : {}),
     ...(d.dawnSeconds != null ? { alba: +d.dawnSeconds || 0 } : {}),
-    ...(d.badges ? { traguardi: d.badges } : {})
+    ...(d.badges ? { traguardi: d.badges } : {}),
+    ...(d.shelfBadges ? { trofei: d.shelfBadges } : {})
   };
 };
 $('esporta').onclick = () => {
@@ -1809,10 +1983,10 @@ $('importa').onchange = async e => {
   } catch { annuncia('File non valido.'); }
   e.target.value = '';
 };
-document.querySelectorAll('nav.filtri button').forEach(b => {
+document.querySelectorAll('#main-libro nav.filtri button').forEach(b => {
   b.onclick = () => {
     filtro = b.dataset.f;
-    document.querySelectorAll('nav.filtri button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    document.querySelectorAll('#main-libro nav.filtri button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     disegna();
   };
 });
@@ -1846,8 +2020,9 @@ function cardLibro(v) {
 // Ricerca, filtro per modo, ordine e vista. La ricerca dura quanto la visita; il resto si ricorda.
 const VISTE = [['carte', 'Carte', 'i-griglia'], ['elenco', 'Elenco', 'i-elenco'], ['copertine', 'Copertine', 'i-copertina']];
 const ORDINI = [['catalogo', 'Ordine del catalogo'], ['titolo', 'Titolo'], ['autore', 'Autore'], ['durata', 'Durata'], ['recenti', 'Aperti di recente'], ['avanti', 'Da finire']];
-const FILTRI_LIBRI = [['tutti', 'Tutti'], ['sincronizzato', 'Audio e testo'], ['audio', 'Solo audio'], ['testo', 'Solo testo']];
-let cerca = '', filtroLibri = 'tutti';
+const FILTRI_LIBRI = [['sincronizzato', 'Audio e testo'], ['audio', 'Solo audio'], ['testo', 'Solo testo']];
+const FILTRI_STATO = [['nuovo', 'Da iniziare'], ['corso', 'In corso'], ['finito', 'Finiti']];
+let cerca = '', filtroLibri = 'tutti', filtroStato = 'tutti';
 const modoDi = v => v.modo || 'sincronizzato';
 const sciolto = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 // Quanto manca del libro, da 0 a 1: serve all'ordine "Da finire".
@@ -1858,10 +2033,22 @@ function restaLibro(v) {
   if (!tot) return 0;
   return 1 - p.reduce((x, c) => x + quanto(c, m) * fattaParte(c, cap[c.n], m), 0) / tot;
 }
+// A che punto e' il libro: "nuovo" se non e' mai stato aperto, "finito" se e' tutto fatto.
+function statoLibro(v) {
+  const m = modoDi(v), cap = leggi(v.chiave + '-stato-v1').cap || {};
+  const iniziato = Object.values(cap).some(x => x && (x.fatto || x.pos > 0));
+  const pronti = (v.dati?.capitoli || []).filter(c => prontoCap(c, m));
+  const tot = pronti.reduce((x, c) => x + quanto(c, m), 0);
+  if (!tot) return iniziato ? 'corso' : 'nuovo';
+  const fatta = pronti.reduce((x, c) => x + quanto(c, m) * fattaParte(c, cap[c.n], m), 0) / tot;
+  if (fatta >= .99) return 'finito';
+  return fatta > 0 || iniziato ? 'corso' : 'nuovo';
+}
 const durataLibro = v => (v.dati?.capitoli || []).filter(c => prontoCap(c, modoDi(v))).reduce((x, c) => x + quanto(c, modoDi(v)), 0);
 function libriVisti() {
   const q = sciolto(cerca).trim();
-  let l = CATALOGO.libri.filter(v => filtroLibri === 'tutti' || modoDi(v) === filtroLibri);
+  let l = CATALOGO.libri.filter(v => (filtroLibri === 'tutti' || modoDi(v) === filtroLibri)
+    && (filtroStato === 'tutti' || statoLibro(v) === filtroStato));
   if (q) l = l.filter(v => sciolto(`${v.titolo} ${v.autore || ''} ${v.sottotitolo || ''}`).includes(q));
   const ordine = stato.ui.ordine, aperti = stato.aperti || {};
   const per = {
@@ -1888,18 +2075,29 @@ function disegnaScaffale() {
     sel.onchange = () => { stato.ui.ordine = sel.value; salvaStato(); disegnaScaffale(); };
   }
   sel.value = u.ordine;
-  // I filtri per modo compaiono solo se nello scaffale c'e' piu' di un modo.
+  // Filtri rapidi: il modo del libro e il punto a cui e' la lettura. I modi compaiono
+  // solo se nello scaffale ce n'e' piu' di uno; gli stati solo se ci sono libri da smistare.
   const modi = new Set(CATALOGO.libri.map(modoDi));
+  const stati = new Set(CATALOGO.libri.map(statoLibro));
+  const perModo = FILTRI_LIBRI.filter(([v]) => modi.size > 1 && modi.has(v));
+  const perStato = FILTRI_STATO.filter(([v]) => stati.size > 1 && stati.has(v));
+  const chip = (attivo, n, al) => el('button', { 'aria-pressed': String(attivo), onclick: al }, n);
   const filtri = $('sc-filtri');
-  filtri.classList.toggle('nascosto', modi.size < 2);
-  filtri.replaceChildren(...FILTRI_LIBRI.filter(([v]) => v === 'tutti' || modi.has(v)).map(([v, n]) =>
-    el('button', { 'aria-pressed': String(filtroLibri === v), onclick: () => { filtroLibri = v; disegnaScaffale(); } }, n)));
+  filtri.classList.toggle('nascosto', !perModo.length && !perStato.length);
+  filtri.replaceChildren(
+    chip(filtroLibri === 'tutti' && filtroStato === 'tutti', 'Tutti',
+      () => { filtroLibri = 'tutti'; filtroStato = 'tutti'; disegnaScaffale(); }),
+    ...perModo.map(([v, n]) => chip(filtroLibri === v, n, () => { filtroLibri = v; disegnaScaffale(); })),
+    ...(perModo.length && perStato.length ? [el('span', { class: 'sep', 'aria-hidden': 'true' })] : []),
+    ...perStato.map(([v, n]) => chip(filtroStato === v, n, () => { filtroStato = v; disegnaScaffale(); })));
   const lista = libriVisti();
   const box = $('libri');
   box.className = 'libri' + (vista[0] === 'carte' ? '' : ' ' + vista[0]);
   box.replaceChildren(...(lista.length
     ? lista.map(cardLibro)
-    : [el('p', { class: 'vuoto' }, cerca ? `Nessun libro per «${cerca}».` : 'Nessun libro in questo scaffale.')]));
+    : [el('p', { class: 'vuoto' }, cerca ? `Nessun libro per «${cerca}».`
+      : filtroLibri !== 'tutti' || filtroStato !== 'tutti' ? 'Nessun libro con questi filtri.'
+      : 'Nessun libro in questo scaffale.')]));
 }
 $('sc-cerca').addEventListener('input', e => { cerca = e.target.value; if (!libroAperto) disegnaScaffale(); });
 $('sc-cerca').addEventListener('keydown', e => { if (e.key === 'Escape' && cerca) { e.stopPropagation(); cerca = ''; e.target.value = ''; disegnaScaffale(); } });
@@ -1915,6 +2113,7 @@ async function arricchisci() {
       if (!v.modo && d.modo) v.modo = d.modo;
     } catch {}
   }));
+  verificaGenerali();
   if (!libroAperto) disegnaScaffale();
 }
 // Cambiando libro il lettore riparte pulito: niente capitolo, tempo e testo di quello di prima.
@@ -1962,7 +2161,7 @@ async function apriLibro(v) {
   $('pagina').classList.add('nascosto');
   $('testo').classList.remove('attivo');
   $('allo-scaffale').classList.toggle('nascosto', CATALOGO.libri.length < 2);
-  document.querySelectorAll('nav.filtri button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === 'tutti')));
+  document.querySelectorAll('#main-libro nav.filtri button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === 'tutti')));
   // In un sito con un libro solo titolo, sottotitolo e avviso sono gia' nella pagina, anche con l'HTML.
   if (!CATALOGO.solo) {
     document.title = v.titolo;
