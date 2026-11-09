@@ -498,7 +498,13 @@ const quanto = (c, m = MODO) => (m === 'testo' ? Math.max(60, Math.round(c.parol
 const fattaParte = (c, s, m = MODO) => (s && s.fatto ? 1 : m === 'testo' ? Math.min(1, (s && s.pos) || 0) : Math.min(1, ((s && s.pos) || 0) / (quanto(c, m) || 1)));
 const pronti = () => capitoli.filter(c => prontoCap(c));
 const sc = n => stato.cap[n] || (stato.cap[n] = { pos: 0, fatto: false, ascoltati: 0, giro: 0, finito: false, sentito: [] });
-const percorso = (c, cart, est) => `${BASE}${cart}/${String(c.n).padStart(3, '0')}.${est}`;
+// Dove sta il file del capitolo: di solito "audio/001.mp3" dentro la cartella del libro, ma il capitolo
+// puo' anche indicare il suo file con "file" (audio) o "testo", pure su un altro sito.
+const percorso = (c, cart, est) => {
+  const suo = cart === 'audio' ? c.file : c.testo;
+  return suo ? new URL(suo, new URL(BASE || './', location.href)).href
+    : `${BASE}${cart}/${String(c.n).padStart(3, '0')}.${est}`;
+};
 const assoluto = p => new URL(p, location.href).href;
 
 function annuncia(t) {
@@ -1228,9 +1234,10 @@ async function leggiSalvati() {
   salvati = new Set();
   if (!('caches' in window) || !CACHE) return;
   const cache = await caches.open(CACHE);
-  const chiavi = await cache.keys();
-  const rx = MODO === 'testo' ? /testi\/(\d+)\.json$/ : /audio\/(\d+)\.mp3$/;
-  salvati = new Set(chiavi.map(r => rx.exec(r.url)).filter(Boolean).map(m => +m[1]));
+  // I file possono avere un nome qualsiasi: il capitolo salvato si riconosce dal suo indirizzo.
+  const avuti = new Set((await cache.keys()).map(r => r.url));
+  const cart = MODO === 'testo' ? 'testi' : 'audio', est = MODO === 'testo' ? 'json' : 'mp3';
+  salvati = new Set(capitoli.filter(c => avuti.has(assoluto(percorso(c, cart, est)))).map(c => c.n));
 }
 function spazio() {
   const box = $('offline-corpo');

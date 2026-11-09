@@ -45,7 +45,7 @@ Il lettore legge più libri da `catalogo.json`, anche da un altro dominio, e ogn
   - `prova/sito` contiene i capitoli 1-3 del romanzo, come libro solo: porta 8780.
   - `prova/semplice/sito` è un libro senza parti: porta 8781.
   - `prova/scaffale` è lo scaffale con tre libri: porta 8782. I libri stanno in `libri/dalmasca` (sincronizzato, copiato da `prova/sito`), `libri/pinocchio-audio` (solo audio) e `libri/pinocchio-testo` (solo testo).
-  - `prova/sorgenti-pinocchio/audio`: i primi 5 capitoli di «Le avventure di Pinocchio» letti da Simona, da `https://archive.org/details/avventure_pinocchio_librivox` (pubblico dominio).
+  - `libri/pinocchio-audio` non ha audio in locale: il suo `capitoli.json` punta ai 36 file di `https://archive.org/details/avventure_pinocchio_librivox` («Le avventure di Pinocchio» lette da Simona, pubblico dominio), ed è costruito con `prova/da-archive.py`. Provato: si ascolta e si salva sul dispositivo; archive.org serve CORS `*`, `Accept-Ranges` e 206.
   - `prova/sorgenti-pinocchio-testo`: il testo da Project Gutenberg, ebook 52484, e i capitoli ricavati con `prova/da-gutenberg.py`.
   - I server si avviano con `node strumenti/server.js prova/scaffale 8782`. Non ci sono launch.json in questo repository.
   - In `prova/sito` restano anche file di lavoro dell'icona: `parziale*.svg`, `combinato.svg`, `confronto.html` e simili. Si possono cancellare.
@@ -91,7 +91,8 @@ L'utente ha approvato l'icona: «mi piace come è adesso». Ha chiesto lui sia i
 ## Prossimi passi
 
 1. Creare il repository su GitHub e fare il push, solo quando l'utente lo dice.
-2. Provare un libro davvero remoto (un `base` su un altro dominio) e il salvataggio sul dispositivo con CORS.
+2. Provare anche un `base` intero su un altro dominio: per ora è remoto solo l'audio, non `capitoli.json`.
+3. Nel modo `audio` i titoli dei capitoli vengono dal nome del file: per un libro di LibriVox conviene scrivere `capitoli.json` con i titoli veri, come fa `prova/da-archive.py`.
 3. Facoltativo: un'immagine PNG per `mediaSession` (l'artwork della schermata di blocco), perché l'SVG lì è supportato poco.
 4. Facoltativo, idea dalla ricerca iniziale: esportare in EPUB 3 Media Overlays. Readest, Thorium e Storyteller supportano già questo formato, mentre Readest ha rifiutato di importare file di sincronizzazione esterni (readest/readest#6854).
 5. Facoltativo: portare nel lettore FFXII (`docs/`) la nuova icona, solo se l'utente lo chiede.

@@ -160,12 +160,23 @@ Nel modo `audio` i capitoli sono i file `.mp3` della cartella `audio`, il `.vtt`
 - `testi/NNN.json`: paragrafi, `[{ "c": [[inizio, "frase", [inizio di ogni parola]], ...] }]`, con `"h": 1` per i titoli e `cit`, `firma`, `st` per citazioni, firme e stacchi; nel modo `testo` il paragrafo è `{ "s": "testo" }`, senza tempi;
 - `capitoli.json`: `{ "modo": "...", "parti": [...], "capitoli": [{ "n", "titolo", "parte", "durata", "parole", "byte" }] }`.
 
+Un capitolo può anche indicare il suo file invece di seguire la regola dei nomi: `"file"` per l'audio e `"testo"` per il testo, relativi a `base` oppure indirizzi completi. Così un libro può stare tutto su un altro sito e nella cartella basta `capitoli.json`: niente audio da copiare e `prepara.js` non serve.
+
+```json
+{ "modo": "audio", "parti": [], "capitoli": [
+  { "n": 1, "titolo": "Il pezzo di legno", "file": "https://archive.org/download/.../cap_01.mp3", "durata": 335, "byte": 5365966 }
+] }
+```
+
+Il sito che ospita i file deve servire CORS e le richieste a intervalli (`Accept-Ranges: bytes`); archive.org fa entrambe le cose, quindi i capitoli si ascoltano e si salvano sul dispositivo anche da lì.
+
 Un capitolo compare nell'elenco come non ancora pronto finché gli manca la `durata` (o le `parole`, nel modo `testo`). Nel modo `testo` la durata della lettura è stimata a 200 parole al minuto.
 
 ## Limiti
 
 - L'interfaccia è solo in italiano.
-- I libri su un altro dominio hanno bisogno di CORS: senza, il lettore non ne legge l'indice e non li salva sul dispositivo.
+- I libri su un altro dominio hanno bisogno di CORS: senza, il lettore non ne legge l'indice, non ne riproduce l'audio e non li salva sul dispositivo.
+- `catalogo.json` e `capitoli.json` conviene tenerli sul sito del lettore: i file dei capitoli, invece, possono stare altrove.
 - Nel modo `testo` la posizione è la frazione di pagina già scorsa: cambiando dimensione del testo il punto resta quello.
 - Colori e icona predefiniti: per un'icona diversa metti `icona.svg` nella cartella del sito prima di `crea-sito.js`.
   Per avere anche le icone PNG (schermata Home di iPhone, icone adattive di Android) lancia prima
