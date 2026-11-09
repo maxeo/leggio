@@ -14,6 +14,8 @@ Ogni libro ha un modo:
 
 Con più libri il sito apre uno **scaffale**: le carte dei libri, e da lì si entra nel libro. I libri si elencano in `catalogo.json` e possono stare anche su un altro dominio.
 
+Nello scaffale ci sono la ricerca per titolo e autore, i filtri per modo (compaiono solo se nello scaffale c'è più di un modo), l'ordine (del catalogo, titolo, autore, durata, aperti di recente, da finire) e tre viste: carte, elenco e copertine. Ordine e vista si ricordano; la ricerca no.
+
 Funzioni: elenco dei capitoli diviso in parti, testo che segue la voce, velocità, salti avanti e indietro, timer di spegnimento, segnalibri, capitoli salvati sul dispositivo, temi chiaro e scuro, traguardi, esportazione e importazione dei progressi. I progressi stanno per libro; tema, carattere e comandi valgono per tutto lo scaffale.
 
 Nato per [L'ultima alba di Dalmasca](https://maxeo.github.io/ultima-alba-di-dalmasca/).

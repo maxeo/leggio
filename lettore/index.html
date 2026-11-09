@@ -101,6 +101,24 @@ svg.ic { width: 22px; height: 22px; fill: currentColor; display: block; }
 .libro small { display: block; font-size: 13px; color: var(--tenue); margin-top: 2px; }
 .libro .barra { margin-top: 8px; height: 3px; }
 .libro .tipo { display: inline-block; margin-top: 7px; padding: 1px 8px; border: 1px solid var(--linea); border-radius: 999px; font-size: 12px; color: var(--tenue); }
+.sc-strumenti { display: flex; gap: 8px; align-items: center; padding: 22px 0 0; }
+.sc-cerca { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; }
+.sc-cerca svg.ic { position: absolute; left: 10px; width: 18px; height: 18px; color: var(--tenue); pointer-events: none; }
+.sc-cerca input { width: 100%; min-height: 44px; padding: 8px 12px 8px 36px; background: var(--pannello); border: 1px solid var(--linea); border-radius: 10px; }
+.sc-cerca input::-webkit-search-cancel-button { filter: invert(.5); }
+.sc-strumenti select { min-height: 44px; padding: 0 6px; background: var(--pannello); border: 1px solid var(--linea); border-radius: 10px; color: var(--tenue); font-size: 14px; max-width: 46vw; }
+.sc-strumenti .btn-tema { border: 1px solid var(--linea); border-radius: 10px; }
+.libri.elenco { grid-template-columns: 1fr; gap: 0; }
+.libri.elenco .libro { grid-template-columns: 34px 1fr; gap: 10px; align-items: center; padding: 12px 0; border: 0; border-top: 1px solid var(--linea); border-radius: 0; }
+.libri.elenco .cop { width: 34px; height: 46px; }
+.libri.elenco .cop svg.ic { width: 18px; height: 18px; }
+.libri.elenco .tipo { display: none; }
+.libri.copertine { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.libri.copertine .libro { grid-template-columns: 1fr; }
+.libri.copertine .cop { width: 100%; height: 200px; }
+.libri.copertine .cop svg.ic { width: 46px; height: 46px; }
+.libri.copertine .tipo { display: none; }
+
 /* Modi del libro: senza audio non c'e' il lettore, senza testo non c'e' il pulsante del testo */
 :root[data-modo="testo"] .lettore, :root[data-modo="testo"] .flotta, :root[data-modo="testo"] #segui,
 :root[data-modo="scaffale"] .lettore, :root[data-modo="scaffale"] .flotta, :root[data-modo="scaffale"] #segui { display: none !important; }
@@ -291,6 +309,10 @@ dialog.celebra::backdrop { background: var(--sfondo); }
   <symbol id="i-su" viewBox="0 0 24 24"><path d="m12 8 7 7-1.4 1.4-5.6-5.6-5.6 5.6L5 15z"/></symbol>
   <symbol id="i-vuoto" viewBox="0 0 24 24"></symbol>
   <symbol id="i-indietro" viewBox="0 0 24 24"><path d="M11 4 4 11v2l7 7 1.4-1.4L7.8 13H20v-2H7.8l4.6-4.6z"/></symbol>
+  <symbol id="i-griglia" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 3h8v8H3zm2 2v4h4V5zm8-2h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zm8-2h8v8h-8zm2 2v4h4v-4z"/></symbol>
+  <symbol id="i-elenco" viewBox="0 0 24 24"><path d="M3 5h3v3H3zm5 .5h13v2H8zM3 10.5h3v3H3zm5 .5h13v2H8zM3 16h3v3H3zm5 .5h13v2H8z"/></symbol>
+  <symbol id="i-copertina" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M4 3h7v12H4zm2 2v8h3V5zm7-2h7v12h-7zm2 2v8h3V5zM4 17h16v2H4zm0 3h11v2H4z"/></symbol>
+  <symbol id="i-cerca" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M10.5 3a7.5 7.5 0 1 0 4.6 13.4l4.2 4.3 1.4-1.4-4.2-4.3A7.5 7.5 0 0 0 10.5 3zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z"/></symbol>
   <symbol id="i-meta" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 0 1 0 16z"/></symbol>
   <symbol id="i-clessidra" viewBox="0 0 24 24"><path d="M6 2h12v2h-1v3.500L13.500 12l3.500 4.500V20h1v2H6v-2h1v-3.500l3.500-4.500L7 7.500V4H6z"/></symbol>
   <symbol id="i-fiamma" viewBox="0 0 24 24"><path d="M13 2s1 3.500-2 6.500C9 10.500 6 12.500 6 16a6 6 0 0 0 12 0c0-3-1.500-5-3-6.500 0 2-1 3-2 3 1-3.500 1-7 0-10.500z"/></symbol>
@@ -332,6 +354,12 @@ dialog.celebra::backdrop { background: var(--sfondo); }
   <p class="sotto" id="sc-sotto">{{sottotitolo}}</p>
 </header>
 <main class="nascosto" id="main-scaffale">
+  <div class="sc-strumenti">
+    <label class="sc-cerca"><svg class="ic"><use href="#i-cerca"/></svg><input id="sc-cerca" type="search" placeholder="Cerca fra i libri" aria-label="Cerca fra i libri" autocomplete="off"></label>
+    <select id="sc-ordine" aria-label="Ordine dei libri"></select>
+    <button class="btn-tema" id="sc-vista"></button>
+  </div>
+  <nav class="filtri" id="sc-filtri" aria-label="Filtra i libri"></nav>
   <div class="libri" id="libri"></div>
   <section class="strumenti">
     <p class="avviso" id="sc-avviso">{{avviso}}</p>
@@ -441,12 +469,13 @@ const $ = id => document.getElementById(id);
 const a = $('a');
 // Le impostazioni valgono per tutti i libri; progressi, segnalibri e traguardi stanno per libro.
 const CH_UI = 'leggio-impostazioni-v1';
-const COMUNI = ['ui', 'tema', 'dim', 'velocita'];
+const COMUNI = ['ui', 'tema', 'dim', 'velocita', 'aperti'];
 let CHIAVE = '', CACHE = '';
 const leggi = k => { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch { return {}; } };
-const UI_BASE = { accento: 'ambra', evid: 38, parole: false, allinea: 'justify', font: 'serif', inter: 1.6, indietro: [15], avanti: [30], continua: true, scambia: false, autoRiga: true, nascosti: ['scarica-file'], scaricaNascosto: true, notteOn: false, notte: 50, noBarra: false, noIcone: false, noAvanz: false, noTitolo: false };
+const UI_BASE = { accento: 'ambra', evid: 38, parole: false, allinea: 'justify', font: 'serif', inter: 1.6, indietro: [15], avanti: [30], continua: true, scambia: false, autoRiga: true, nascosti: ['scarica-file'], scaricaNascosto: true, notteOn: false, notte: 50, noBarra: false, noIcone: false, noAvanz: false, noTitolo: false, vista: 'carte', ordine: 'catalogo' };
 const normalizzaCap = cap => { Object.values(cap).forEach(s => { if (s.ascoltati == null) s.ascoltati = s.pos > 5 ? s.pos : 0; if (s.giro == null) s.giro = s.ascoltati; if (s.finito == null) s.finito = !!s.fatto; else if (s.sentito == null) s.finito = false; if (s.sentito == null) s.sentito = []; }); };
-const vuoto = () => ({ cap: {}, segni: [], ultimo: null, velocita: 1, dim: 19, tema: null, giorni: {}, notte: 0, alba: 0, traguardi: {} });
+// "aperti" tiene quando ogni libro e' stato aperto l'ultima volta: serve all'ordine dello scaffale.
+const vuoto = () => ({ cap: {}, segni: [], ultimo: null, velocita: 1, dim: 19, tema: null, giorni: {}, notte: 0, alba: 0, traguardi: {}, aperti: {} });
 let stato = vuoto();
 function sistemaStato() {
   if (stato.ui && !stato.ui.scaricaNascosto) stato.ui.nascosti = [...(stato.ui.nascosti || []), 'scarica-file'];
@@ -1735,7 +1764,7 @@ $('flotta-play').onclick = () => $('play').click();
 $('flotta-su').onclick = () => { stato.ui.noBarra = false; salvaStato(); applicaUi(); altezzaLettore(); };
 $('celebra').addEventListener('click', e => { if (!e.target.closest('.celebra-corpo')) $('celebra').close(); });
 $('pannello').addEventListener('click', e => { if (e.target === $('pannello')) $('pannello').close(); });
-const CHIAVI_UI = { accento: 'accent', evid: 'highlight', font: 'font', inter: 'lineHeight', indietro: 'skipBack', avanti: 'skipForward', continua: 'autoNext', scambia: 'swapControls', autoRiga: 'autoRow', nascosti: 'hiddenButtons', notteOn: 'nightLightOn', notte: 'nightLight', noBarra: 'hideBar', noIcone: 'hideIconRow', noAvanz: 'hideProgress', noTitolo: 'hideTitle' };
+const CHIAVI_UI = { accento: 'accent', evid: 'highlight', font: 'font', inter: 'lineHeight', indietro: 'skipBack', avanti: 'skipForward', continua: 'autoNext', scambia: 'swapControls', autoRiga: 'autoRow', nascosti: 'hiddenButtons', notteOn: 'nightLightOn', notte: 'nightLight', noBarra: 'hideBar', noIcone: 'hideIconRow', noAvanz: 'hideProgress', noTitolo: 'hideTitle', vista: 'shelfView', ordine: 'shelfSort' };
 const perEsporta = () => ({
   chapters: Object.fromEntries(Object.entries(stato.cap).map(([n, s]) => [n, { position: s.pos, listened: s.fatto, finished: !!s.finito, listenedSeconds: Math.round((s.ascoltati || 0) * 10) / 10, currentRunSeconds: Math.round((s.giro || 0) * 10) / 10, heardRanges: s.sentito || [] }])),
   bookmarks: stato.segni.map(s => ({ chapter: s.n, time: s.t, text: s.frase })),
@@ -1814,7 +1843,66 @@ function cardLibro(v) {
       el('span', { class: 'tipo' }, NOME_MODO[m] || m),
       tot && fatto > 0 ? barra(Math.min(100, fatto / tot * 100)) : null));
 }
-const disegnaScaffale = () => $('libri').replaceChildren(...CATALOGO.libri.map(cardLibro));
+// Ricerca, filtro per modo, ordine e vista. La ricerca dura quanto la visita; il resto si ricorda.
+const VISTE = [['carte', 'Carte', 'i-griglia'], ['elenco', 'Elenco', 'i-elenco'], ['copertine', 'Copertine', 'i-copertina']];
+const ORDINI = [['catalogo', 'Ordine del catalogo'], ['titolo', 'Titolo'], ['autore', 'Autore'], ['durata', 'Durata'], ['recenti', 'Aperti di recente'], ['avanti', 'Da finire']];
+const FILTRI_LIBRI = [['tutti', 'Tutti'], ['sincronizzato', 'Audio e testo'], ['audio', 'Solo audio'], ['testo', 'Solo testo']];
+let cerca = '', filtroLibri = 'tutti';
+const modoDi = v => v.modo || 'sincronizzato';
+const sciolto = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+// Quanto manca del libro, da 0 a 1: serve all'ordine "Da finire".
+function restaLibro(v) {
+  const m = modoDi(v), cap = (leggi(v.chiave + '-stato-v1').cap) || {};
+  const p = (v.dati?.capitoli || []).filter(c => prontoCap(c, m));
+  const tot = p.reduce((x, c) => x + quanto(c, m), 0);
+  if (!tot) return 0;
+  return 1 - p.reduce((x, c) => x + quanto(c, m) * fattaParte(c, cap[c.n], m), 0) / tot;
+}
+const durataLibro = v => (v.dati?.capitoli || []).filter(c => prontoCap(c, modoDi(v))).reduce((x, c) => x + quanto(c, modoDi(v)), 0);
+function libriVisti() {
+  const q = sciolto(cerca).trim();
+  let l = CATALOGO.libri.filter(v => filtroLibri === 'tutti' || modoDi(v) === filtroLibri);
+  if (q) l = l.filter(v => sciolto(`${v.titolo} ${v.autore || ''} ${v.sottotitolo || ''}`).includes(q));
+  const ordine = stato.ui.ordine, aperti = stato.aperti || {};
+  const per = {
+    titolo: (x, y) => sciolto(x.titolo).localeCompare(sciolto(y.titolo), 'it'),
+    autore: (x, y) => sciolto(x.autore).localeCompare(sciolto(y.autore), 'it') || sciolto(x.titolo).localeCompare(sciolto(y.titolo), 'it'),
+    durata: (x, y) => durataLibro(y) - durataLibro(x),
+    recenti: (x, y) => (aperti[y.chiave] || 0) - (aperti[x.chiave] || 0),
+    avanti: (x, y) => restaLibro(x) - restaLibro(y)
+  }[ordine];
+  return per ? [...l].sort(per) : l;
+}
+function disegnaScaffale() {
+  const u = stato.ui;
+  const vista = VISTE.find(x => x[0] === u.vista) || VISTE[0];
+  const prossima = VISTE[(VISTE.indexOf(vista) + 1) % VISTE.length];
+  const b = $('sc-vista');
+  b.replaceChildren(icona(vista[2]));
+  b.setAttribute('aria-label', `Vista: ${vista[1]}. Passa a ${prossima[1].toLowerCase()}`);
+  b.title = b.getAttribute('aria-label');
+  b.onclick = () => { stato.ui.vista = prossima[0]; salvaStato(); disegnaScaffale(); };
+  const sel = $('sc-ordine');
+  if (!sel.options.length) {
+    sel.replaceChildren(...ORDINI.map(([v, n]) => el('option', { value: v }, n)));
+    sel.onchange = () => { stato.ui.ordine = sel.value; salvaStato(); disegnaScaffale(); };
+  }
+  sel.value = u.ordine;
+  // I filtri per modo compaiono solo se nello scaffale c'e' piu' di un modo.
+  const modi = new Set(CATALOGO.libri.map(modoDi));
+  const filtri = $('sc-filtri');
+  filtri.classList.toggle('nascosto', modi.size < 2);
+  filtri.replaceChildren(...FILTRI_LIBRI.filter(([v]) => v === 'tutti' || modi.has(v)).map(([v, n]) =>
+    el('button', { 'aria-pressed': String(filtroLibri === v), onclick: () => { filtroLibri = v; disegnaScaffale(); } }, n)));
+  const lista = libriVisti();
+  const box = $('libri');
+  box.className = 'libri' + (vista[0] === 'carte' ? '' : ' ' + vista[0]);
+  box.replaceChildren(...(lista.length
+    ? lista.map(cardLibro)
+    : [el('p', { class: 'vuoto' }, cerca ? `Nessun libro per «${cerca}».` : 'Nessun libro in questo scaffale.')]));
+}
+$('sc-cerca').addEventListener('input', e => { cerca = e.target.value; if (!libroAperto) disegnaScaffale(); });
+$('sc-cerca').addEventListener('keydown', e => { if (e.key === 'Escape' && cerca) { e.stopPropagation(); cerca = ''; e.target.value = ''; disegnaScaffale(); } });
 // Le carte mostrano quanti capitoli ci sono: lo dice l'indice di ogni libro, letto a parte.
 async function arricchisci() {
   await Promise.all(CATALOGO.libri.map(async v => {
@@ -1865,6 +1953,7 @@ async function apriLibro(v) {
   LIBRO = v; BASE = v.base || ''; MODO = v.modo || 'sincronizzato';
   libroAperto = v.chiave;
   caricaStato(v.chiave);
+  stato.aperti = { ...stato.aperti, [v.chiave]: Date.now() };
   document.documentElement.dataset.modo = MODO;
   $('alto-scaffale').classList.add('nascosto');
   $('main-scaffale').classList.add('nascosto');
