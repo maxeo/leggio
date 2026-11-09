@@ -20,11 +20,14 @@ Funzioni: elenco dei capitoli diviso in parti, testo che segue la voce, velocit�
 
 I traguardi sono divisi in due tab. **Libri in corso** chiede prima quale libro guardare e poi mostra i traguardi dei suoi capitoli, con i nomi scelti dal libro in `traguardi`: dentro un libro quello aperto è già scelto. **Generali** conta il tempo, i giorni di fila e i libri finiti di tutto lo scaffale, sommando i progressi di ogni libro, e sta con le impostazioni invece che con un libro. Senza un libro aperto parte il tab Generali, dentro un libro quello dei libri in corso.
 
-Nato per [L'ultima alba di Dalmasca](https://maxeo.github.io/ultima-alba-di-dalmasca/).
+**[Esempio](https://maxeo.github.io/leggio/)**: uno scaffale con quattro libri, uno per modo.
+
+Nato per [L'ultima alba di Dalmasca](https://maxeo.github.io/ultima-alba-di-dalmasca/), che lo usa.
 
 ## Struttura
 
 ```
+docs/         lo scaffale di esempio pubblicato su GitHub Pages
 lettore/      il lettore: modello di index.html, service worker, icona, caratteri
 strumenti/
   prepara.js    capitoli in Markdown + audio + sottotitoli → dati del libro

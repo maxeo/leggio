@@ -22,7 +22,7 @@ Richiesta successiva: lo strumento deve essere **facile da integrare** in un alt
 
 ## Stato attuale
 
-`C:\Users\matteo\Documents\leggio` è un repository git con i commit. `.gitignore` esclude `prova/`, `node_modules/` e `icone/gen*/` (40 MB di mosaici generati: se vanno tenuti, chiedere all'utente). È pubblicato su https://github.com/maxeo/leggio (pubblico, licenza MIT), rilascio `v1.0.0`.
+`C:\Users\matteo\Documents\leggio` è un repository git con i commit. `.gitignore` esclude `prova/`, `node_modules/` e `icone/gen*/` (40 MB di mosaici generati: se vanno tenuti, chiedere all'utente). È pubblicato su https://github.com/maxeo/leggio (pubblico, licenza MIT), rilascio `v1.0.0`. GitHub Pages serve `docs/` su https://maxeo.github.io/leggio/: è la copia dello scaffale di prova (`prova/scaffale`, che resta ignorato da git) con i testi del catalogo cambiati da «prova» a «esempio», 12 MB di cui 9,7 sono l'audio del canto I. Si rifa' copiando `prova/scaffale/libri` e `catalogo.json` in `docs/` e lanciando `node strumenti/leggio.js sito docs`.
 
 Il lettore legge più libri da `catalogo.json`, anche da un altro dominio, e ogni libro ha un modo: `sincronizzato`, `audio`, `testo`. Con un libro solo il sito resta com'era, senza scaffale. I dettagli dei formati stanno nel README.
 
