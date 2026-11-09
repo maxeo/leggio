@@ -1,4 +1,4 @@
-// Copia il lettore nella cartella del sito e lo personalizza con i dati di libro.json.
+// Copia il lettore nella cartella del sito e lo personalizza con i dati di catalogo.json, oppure di libro.json.
 // Uso: node strumenti/crea-sito.js <cartella del sito>
 // Scrive index.html, sw.js, manifest.webmanifest e caratteri/; icona.svg solo se la cartella non ne ha già una.
 // Le icone PNG predefinite (iPhone, Android) e icona-piccola.svg si copiano solo insieme all'icona predefinita: per un'icona
@@ -7,14 +7,21 @@ const fs = require('fs'), path = require('path');
 
 const LETTORE = path.join(__dirname, '..', 'lettore');
 const SITO = path.resolve(process.argv[2] || '.');
-const dati = JSON.parse(fs.readFileSync(path.join(SITO, 'libro.json'), 'utf8'));
-if (!dati.titolo) { console.error('libro.json: manca "titolo"'); process.exit(1); }
+// Con catalogo.json il sito ha uno scaffale di piu' libri; con libro.json ne ha uno solo.
+const fileCat = path.join(SITO, 'catalogo.json'), fileLibro = path.join(SITO, 'libro.json');
+const scaffale = fs.existsSync(fileCat);
+const sorgente = scaffale ? fileCat : fileLibro;
+if (!fs.existsSync(sorgente)) { console.error('serve catalogo.json oppure libro.json nella cartella del sito'); process.exit(1); }
+const dati = JSON.parse(fs.readFileSync(sorgente, 'utf8'));
+if (!dati.titolo) { console.error(`${path.basename(sorgente)}: manca "titolo"`); process.exit(1); }
 
 const chiave = dati.chiave || dati.titolo.normalize('NFD').replace(/[^\w\s-]/g, '').trim().toLowerCase().replace(/[\s_-]+/g, '-');
-const libro = {
+// Nello scaffale i dati di ogni libro arrivano da catalogo.json: nella pagina non ne va scritto nessuno.
+const libro = scaffale ? null : {
   titolo: dati.titolo,
   autore: dati.autore || '',
   chiave,
+  modo: dati.modo || 'sincronizzato',
   traguardi: { primaParte: 'La prima parte', fine: "Fino all'ultima pagina", ...dati.traguardi }
 };
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -63,4 +70,4 @@ fs.writeFileSync(path.join(SITO, 'manifest.webmanifest'), JSON.stringify({
   theme_color: '#14121c',
   icons: icone
 }, null, 2) + '\n');
-console.log(`Lettore creato in ${SITO} (chiave "${chiave}")`);
+console.log(`Lettore creato in ${SITO} (chiave "${chiave}"${scaffale ? `, scaffale di ${(dati.libri || []).length} libri` : ''})`);
