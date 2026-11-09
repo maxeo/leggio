@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="9 9 1236 1236">
+  <title>Leggio</title>
+  <defs>
+    <!-- Bagliore ambra caldo dietro il simbolo, che sfuma nel blu notte ai bordi. -->
+    <radialGradient id="bagliore" gradientUnits="userSpaceOnUse" cx="627" cy="430" r="800">
+      <stop offset="0" stop-color="#774c16"/>
+      <stop offset=".14" stop-color="#5f3f16"/>
+      <stop offset=".3" stop-color="#412c14"/>
+      <stop offset=".45" stop-color="#322312"/>
+      <stop offset=".6" stop-color="#231e19"/>
+      <stop offset=".8" stop-color="#14181d"/>
+      <stop offset="1" stop-color="#02101f"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Riquadro -->
+  <rect x="9.5" y="9.5" width="1235" height="1235" rx="238.3" fill="url(#bagliore)"/>
+
+  <!-- Le forme color crema hanno un bordo dello stesso colore con giunti arrotondati:
+       smussa gli angoli vivi (raggio 4) senza complicare i tracciati. -->
+  <g fill="#fef7e9" stroke="#fef7e9" stroke-width="8" stroke-linejoin="round">
+
+    <!-- Archetto delle cuffie: la fascia fra due ellissi, esterna (centro 623.5,582.6,
+         raggi 420.9x432.7) e interna (centro 625.3,593.1, raggi 367.3x379.8).
+         I centri sfalsati la fanno assottigliare verso il basso. È divisa in tre pezzi
+         da due tagli dritti e finisce sopra i padiglioni con un taglio obliquo.
+         Come nel disegno di riferimento, l'arco non è perfettamente simmetrico:
+         i centri stanno qualche pixel a sinistra di x=627 e i tagli di destra
+         hanno posizione e inclinazione proprie. -->
+    <path id="archetto-lato" d="M206.3 525.8 A420.9 432.7 0 0 1 370.1 237.2 L404.7 289.4 A367.3 379.8 0 0 0 268.4 503.3Z"/>
+    <path d="M394 219.9 A420.9 432.7 0 0 1 861.3 225.6 L826.6 275.4 A367.3 379.8 0 0 0 428.7 272.3Z"/>
+    <path d="M884.3 243 A420.9 432.7 0 0 1 1040.7 525 L982.3 504 A367.3 379.8 0 0 0 849.8 292.5Z"/>
+
+    <!-- Padiglioni: ellisse tagliata da una retta verticale, con il lato piatto verso l'interno.
+         Sinistro: centro 304.4,707.3, raggi 146.8x175.6, taglio x=264.9.
+         Destro (come nel disegno, non è lo specchio esatto): centro 947.1,708.3,
+         raggi 149.2x176.3, taglio x=989.6. -->
+    <path id="padiglione" d="M264.9 538.2 A146.8 175.6 0 0 0 264.9 876.4Z"/>
+    <path id="padiglione-destro" d="M989.6 539.3 A149.2 176.3 0 0 1 989.6 877.3Z"/>
+
+    <!-- Barre esterne della forma d'onda -->
+    <rect x="294.9" y="517.4" width="63.1" height="383.1" rx="31.6"/>
+    <rect x="896" y="517.4" width="63.1" height="383.1" rx="31.6"/>
+
+    <!-- Libro aperto: ogni pagina è la parte dell'ellisse A (centro 438.2,1220.5,
+         raggi 248.1x312.6) che resta sopra l'ellisse B (centro 405.8,1133.7,
+         raggi 253.0x188.3), tagliata al centro (x=627) e sul fondo (y=1028).
+         Le due pagine si uniscono lungo il fondo piatto. -->
+    <path id="pagina" d="M296.6 963.9 A248.1 312.6 0 0 1 627 1017.7 V1028.0 H615.1 A253.0 188.3 0 0 0 296.6 963.9Z"/>
+    <use href="#pagina" transform="translate(1254 0) scale(-1 1)"/>
+  </g>
+
+  <!-- Barre intermedie in ambra chiaro -->
+  <g fill="#fec97a">
+    <rect x="446.8" y="578.9" width="72" height="296.9" rx="36"/>
+    <rect x="735.1" y="578.9" width="72" height="296.9" rx="36"/>
+  </g>
+
+  <!-- Barra centrale: la parola letta, con la punta di un segnalibro.
+       Il bordo del colore dello sfondo la separa dal libro e scava la V fra le pagine. -->
+  <path fill="#ffb002" stroke="url(#bagliore)" stroke-width="23.9" paint-order="stroke" d="M586.3 507.1 A40.7 40.7 0 0 1 667.7 507.1 V919.2 Q667.7 939.5 653.2 953.6 L636.6 969.8 Q627 979 617.4 969.8 L600.8 953.6 Q586.3 939.5 586.3 919.2Z"/>
+</svg>
