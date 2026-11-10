@@ -1151,9 +1151,10 @@ $('testo').onclick = () => {
   const pg = $('pagina');
   const ora = pg.classList.toggle('nascosto');
   $('testo').classList.toggle('attivo', !ora);
+  stato.pagina = !ora; salvaStato();
   if (!ora) { seguiVoce = true; altezzaLettore(); setTimeout(() => cue[cueOra]?.el.scrollIntoView({ block: 'center' }), 60); }
 };
-$('chiudi-pagina').onclick = () => { $('pagina').classList.add('nascosto'); $('testo').classList.remove('attivo'); $('segui').classList.add('nascosto'); };
+$('chiudi-pagina').onclick = () => { $('pagina').classList.add('nascosto'); $('testo').classList.remove('attivo'); $('segui').classList.add('nascosto'); stato.pagina = false; salvaStato(); };
 const staccaSegui = () => { if (seguiVoce && !$('pagina').classList.contains('nascosto')) { seguiVoce = false; $('segui').classList.remove('nascosto'); } };
 $('corpo').addEventListener('wheel', staccaSegui, { passive: true });
 $('corpo').addEventListener('touchmove', staccaSegui, { passive: true });
@@ -2239,6 +2240,8 @@ function instrada() {
     if (!ok) return;
     if (n) apriCapitolo(n);
     else if (stato.ultimo) apriCapitolo(stato.ultimo);
+    // Dopo un ricaricamento la pagina del testo resta aperta, se lo era.
+    if (MODO === 'sincronizzato' && stato.pagina && corrente != null) apriPagina();
   });
 }
 $('allo-scaffale').onclick = () => mostraScaffale();
