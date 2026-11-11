@@ -1,7 +1,7 @@
 // Tiene il lettore disponibile senza rete e serve i capitoli salvati con le richieste a intervalli.
 // I libri dello scaffale hanno ognuno la sua cache "<chiave del libro>-audio-v1", anche su un altro dominio.
-const SHELL = '{{chiave}}-shell-v4';
-const FILE = ['./', 'index.html', 'manifest.webmanifest', {{fileIcone}}, 'caratteri/pinyon-script-latin.woff2'];
+const SHELL = '{{chiave}}-shell-v5';
+const FILE = ['./', 'index.html', 'manifest.webmanifest', {{fileIcone}}, 'caratteri/italianno-latin.woff2'];
 const diLibro = n => n.endsWith('-audio-v1');
 
 self.addEventListener('install', e => {
